@@ -1,10 +1,16 @@
-import re
-
 PREFIX = "/video/animehd"
 NAME = "AnimeHD"
 ART = "art-default.jpg"
 ICON = "icon-default.png"
 START_MENU = [["Ongoing anime", "ongoing"], ["All anime", "all"]]
+MP4UPLOAD = [
+	Regex('\'file\': \'(http\://.*?\.mp4)\''),
+	Regex('\'image\': \'(http\://.*?\.jpg)\'')
+]
+ARKVID = [
+	Regex('src="(http:\/\/.*?)"'), 
+	Regex('poster="(http:\/\/.*?)"')
+]
 
 class Anime:
 
@@ -18,18 +24,13 @@ class Anime:
 
 class Video:
 
-	MP4UPLOAD = ['\'file\': \'(http\://.*?\.mp4)\'', '\'image\': \'(http\://.*?\.jpg)\'']
-	ARKVID = ['src="(http:\/\/.*?)"', 'poster="(http:\/\/.*?)"']
-
 	def __init__(self, url):
 		self.url = url
 
 	def scrape(self, html, regex):
-		if regex:
-			rg = re.compile(regex, re.IGNORECASE|re.DOTALL)
-			found = rg.search(html)
-			if found:
-				return found.group(1)
+		found = regex.search(html)
+		if found:
+			return found.group(1)
 		return None
 
 	def get(self, host):
@@ -40,17 +41,14 @@ class Video:
 			return None
 		if src and host:
 			if host == "MP4Upload":
-				vid_regex = self.MP4UPLOAD[0]
-				img_regex = self.MP4UPLOAD[1]
+				vid = self.scrape(src, MP4UPLOAD[0])
+				img = self.scrape(src, MP4UPLOAD[1])
 			elif host == "Arkvid":
-				vid_regex = self.ARKVID[0]
-				img_regex = self.ARKVID[1]
+				vid = self.scrape(src, ARKVID[0])
+				img = self.scrape(src, ARKVID[1])
 
-			if vid_regex and img_regex: 
-				vid = self.scrape(src, vid_regex)
-				img = self.scrape(src, img_regex)
-				if vid and img:
-					return [vid, img]
+			if vid and img: 
+				return [vid, img]
 		return None
 
 def Start():
