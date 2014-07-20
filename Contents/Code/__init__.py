@@ -123,7 +123,7 @@ def EpisodeList(anime , cover, name):
 	else:
 		Log.Error("Failed loading episodes for " + name)
 
-@route(PREFIX + "/watch/mirror")
+@route(PREFIX + "/watch/mirror", include_container=bool)
 def CreateVideo(url, thumb, anime, episode, resolution, host, include_container=False):
 	video_object = VideoClipObject(
 		key = Callback(CreateVideo, url=url, thumb=thumb, anime=anime, episode=episode, resolution=resolution, host=host, include_container=True),
